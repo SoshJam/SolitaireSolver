@@ -41,6 +41,10 @@ namespace SolitaireSolver
                 allCards.Add((char)(x + 32)); // Add the lower-case version as well
             }
 
+            // Set up the board
+            for (int i = 0; i < 7; i++)
+                board[i] = new List<char>();
+
             // Start a game
             Reset();
         }
