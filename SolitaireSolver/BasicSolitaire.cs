@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SolitaireSolver
 {
-    public class BasicSolitaireGame : SolitaireHandler
+    public class BasicSolitaire : ISolitaire
     {
         // A simple list of all cards
         private HashSet<char> allCards = new HashSet<char>();
@@ -32,7 +32,7 @@ namespace SolitaireSolver
         private char[] foundationPiles = new char[4];
 
         // Set up variables
-        public BasicSolitaireGame()
+        public BasicSolitaire()
         {
             // Add all the cards to the array of all cards
             allCards.Clear();

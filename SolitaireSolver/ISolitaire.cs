@@ -1,6 +1,6 @@
 ﻿namespace SolitaireSolver
 {
-    public interface SolitaireHandler
+    public interface ISolitaire
     {
         /// <summary>
         /// Get a collection of cards currently on the main game board.

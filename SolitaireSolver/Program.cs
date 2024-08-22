@@ -2,7 +2,7 @@
 
 Console.WriteLine("Starting Game");
 
-string FormatBoard(SolitaireHandler game)
+string FormatBoard(ISolitaire game)
 {
     List<char>[] board = game.GetBoard();
     char[] foundations = game.GetFoundationPiles();
@@ -58,7 +58,7 @@ string FormatBoard(SolitaireHandler game)
 }
 
 // Setup Game
-SolitaireHandler game = new BasicSolitaireGame();
+ISolitaire game = new BasicSolitaire();
 
 Console.WriteLine(FormatBoard(game));
 
