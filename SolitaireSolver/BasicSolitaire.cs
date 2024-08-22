@@ -69,7 +69,7 @@
 
             // Reveal the top card of this pile if necessary
             revealed = '\0';
-            if (board[column].Count == 0)
+            if (board[column].Count == 0 && faceDownBoardCards[column] > 0)
             {
                 revealed = deck.Pop();
                 faceDownBoardCards[column]--;
