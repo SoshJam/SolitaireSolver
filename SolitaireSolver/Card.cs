@@ -139,8 +139,12 @@
         public static string ToString(char input)
         {
             // Make sure the card is in the valid range
-            if (!(input >= 'A' && input <= 'Z') && !(input >= 'a' && input <= 'z'))
+            if (!(input >= 'A' && input <= 'Z') && !(input >= 'a' && input <= 'z') && input != '\0')
                 throw new ArgumentException("Input char must be a letter");
+
+            // Return empty spaces if necessary
+            if (input == '\0')
+                return "  ";
 
             // Get the suit and value of the card
             Suit suit = GetSuit(input);
