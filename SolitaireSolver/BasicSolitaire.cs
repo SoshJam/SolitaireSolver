@@ -292,7 +292,7 @@
                 deck.Push(tempDeck.Pop());
 
             // Reset the foundation piles.
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 foundationPiles[i] = '\0';
         }
 
