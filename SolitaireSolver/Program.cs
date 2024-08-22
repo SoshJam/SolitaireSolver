@@ -60,10 +60,11 @@ string FormatBoard(ISolitaire game)
 // Setup Game
 ISolitaire game = new BasicSolitaire();
 AbstractSolver solver = new BasicSolver(game);
+string suggestedQuery = solver.CalculateNextMove();
 solver.Reset(game);
 
 Console.WriteLine(FormatBoard(game));
-Console.WriteLine("Solver recommends: " + solver.CalculateNextMove() + (solver.state != SolverState.Normal ? " (stumped)" : ""));
+Console.WriteLine("Solver recommends: " + suggestedQuery + (solver.state != SolverState.Normal ? " (stumped)" : ""));
 
 // Main Loop
 string? query;
@@ -72,6 +73,13 @@ while (true)
     query = Console.ReadLine();
     if (query == null)
         continue;
+
+    // Go with the suggestion if nothing is entered
+    if (query.Length == 0)
+    {
+        query = suggestedQuery;
+        Console.Write("[ " + query + " ]\n");
+    }
 
     string command = query.Split(' ')[0];
     string[] parameters = query.Split(' ').Skip(1).ToArray();
@@ -265,5 +273,6 @@ while (true)
     }
 
     Console.WriteLine(FormatBoard(game));
-    Console.WriteLine("Solver recommends: " + solver.CalculateNextMove() + (solver.state != SolverState.Normal ? " (stumped)" : ""));
+    suggestedQuery = solver.CalculateNextMove();
+    Console.WriteLine("Solver recommends: " + suggestedQuery + (solver.state != SolverState.Normal ? " (stumped)" : ""));
 }
