@@ -183,7 +183,7 @@ namespace SolitaireSolver
             List<char> movedCards = new List<char>();
             for (int i = offset; i < board[start].Count; i++)
             {
-                movedCards.Add(i);
+                movedCards.Add(board[start][i]);
             }
 
             // If the target column is empty, the base card must be a king to move it there
