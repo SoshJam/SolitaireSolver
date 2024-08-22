@@ -155,7 +155,11 @@ namespace SolitaireSolver
 
         public List<char>[] GetBoard()
         {
+            // Set up the output board
             List<char>[] outputBoard = new List<char>[7];
+            for (int i = 0; i < 7; i++)
+                outputBoard[i] = new List<char>();
+
             for (int i = 0; i < 7; i++)
             {
                 // First add the amount of face-down cards
@@ -166,6 +170,7 @@ namespace SolitaireSolver
                 foreach (char c in board[i])
                     outputBoard[i].Add(c);
             }
+
             return outputBoard;
         }
 
