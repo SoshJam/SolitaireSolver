@@ -59,7 +59,7 @@ string FormatBoard(ISolitaire game)
 
 // Setup Game
 ISolitaire game = new BasicSolitaire();
-ISolver solver = new BasicSolver();
+AbstractSolver solver = new BasicSolver(game);
 solver.Reset(game);
 
 Console.WriteLine(FormatBoard(game));
