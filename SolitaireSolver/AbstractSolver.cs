@@ -6,28 +6,28 @@
         ISolitaire game;
 
         // A simple list of all cards
-        private HashSet<char> allCards = new HashSet<char>();
+        protected HashSet<char> allCards = new HashSet<char>();
 
         // The cards currently face-up on the board
-        private List<char>[] board = new List<char>[7];
+        protected List<char>[] board = new List<char>[7];
 
         // The highest cards in the foundation piles
-        private char[] foundationPiles = new char[4];
+        protected char[] foundationPiles = new char[4];
 
         // The card currently atop the waste pile (or \0 if empty)
-        private char stock = '\0';
+        protected char stock = '\0';
 
         // The cards we know to be in the stock pile
-        private HashSet<char> cardsInStock = new HashSet<char>();
+        protected HashSet<char> cardsInStock = new HashSet<char>();
 
         // The cards we know to be either on the board or in a foundation pile
-        private HashSet<char> cardsInPlay = new HashSet<char>();
+        protected HashSet<char> cardsInPlay = new HashSet<char>();
 
         // The cards we haven't seen yet
-        private HashSet<char> cardsMissing = new HashSet<char>();
+        protected HashSet<char> cardsMissing = new HashSet<char>();
 
         // If this is 24 we have seen every card in the stock pile
-        private int seenStock = 0;
+        protected int seenStock = 0;
 
         // Set up variables
         public AbstractSolver(ISolitaire newGame)
@@ -63,7 +63,7 @@
             seenStock = 0;
         }
 
-        private void Update()
+        protected void Update()
         {
             // Easy updates
             board = game.GetBoard();
