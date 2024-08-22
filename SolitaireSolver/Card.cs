@@ -191,6 +191,23 @@
         {
             return input <= 'Z';
         }
+
+        /// <summary>
+        /// Generates both cards with the given color and value.
+        /// </summary>
+        /// <param name="isBlack">If the card is black.</param>
+        /// <param name="value">The value of the card.</param>
+        /// <returns>An array of two chars representing cards.</returns>
+        public static char[] FromColorAndValue(bool isBlack, int value)
+        {
+            char startChar = (char) ((isBlack ? 'A' : 'a') - 1);
+            char[] cards = new char[2];
+
+            cards[0] = (char) (startChar + value);      // S or H
+            cards[1] = (char) (startChar + value + 13); // C or D
+
+            return cards;
+        }
     }
 
     public enum Suit
