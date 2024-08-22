@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -79,6 +80,7 @@ namespace SolitaireSolver
             if (board[column].Count == 0)
             {
                 revealed = deck.Pop();
+                faceDownBoardCards[column]--;
                 board[column].Add(revealed);
             }
 
@@ -209,15 +211,16 @@ namespace SolitaireSolver
                 // Move cards one at a time
                 foreach (char c in movedCards)
                 {
-                    board[start].Add(c);
+                    board[end].Add(c);
                     board[start].Remove(c);
                 }
 
                 // Reveal a card if necessary
                 revealed = '\0';
-                if (offset == 0 || board[start].Count == 0) // Second half of this should be redundant, but just in case
+                if ((offset == 0 || board[start].Count == 0) && faceDownBoardCards[start] > 0)
                 {
                     revealed = deck.Pop();
+                    faceDownBoardCards[start]--;
                     board[start].Add(revealed);
                 }
 
@@ -233,15 +236,16 @@ namespace SolitaireSolver
                 // Move cards one at a time
                 foreach (char c in movedCards)
                 {
-                    board[start].Add(c);
+                    board[end].Add(c);
                     board[start].Remove(c);
                 }
 
                 // Reveal a card if necessary
                 revealed = '\0';
-                if (offset == 0 || board[start].Count == 0) // Second half of this should be redundant, but just in case
+                if ((offset == 0 || board[start].Count == 0) && faceDownBoardCards[start] > 0)
                 {
                     revealed = deck.Pop();
+                    faceDownBoardCards[start]--;
                     board[start].Add(revealed);
                 }
 
@@ -325,6 +329,7 @@ namespace SolitaireSolver
 
                 // Otherwise the move is valid
                 targetColumn.Add(topCard);
+                wastePile.Pop();
                 revealed = PeekStock();
                 return true;
             }
@@ -336,6 +341,7 @@ namespace SolitaireSolver
             if (Card.IsBlack(targetCard) != Card.IsBlack(topCard) && Card.GetValue(targetCard) - 1 == Card.GetValue(topCard))
             {
                 targetColumn.Add(topCard);
+                wastePile.Pop();
                 revealed = PeekStock();
                 return true;
             }
