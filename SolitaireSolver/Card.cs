@@ -32,6 +32,8 @@
         /// <returns>The value of the card.</returns>
         public static int GetValue(char input)
         {
+            if (input == '\0')
+                return 0;
             if (input >= 'n')
                 return input - 'n' + 1;
             if (input >= 'a')
