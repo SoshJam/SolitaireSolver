@@ -91,7 +91,7 @@
             { 
                 foreach (char c in board[i])
                 {
-                    if (c != '#') continue;
+                    if (c == '#') continue;
 
                     if (cardsMissing.Contains(c))
                     {

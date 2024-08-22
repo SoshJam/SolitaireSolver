@@ -1,4 +1,6 @@
-﻿namespace SolitaireSolver
+﻿using System.Runtime.CompilerServices;
+
+namespace SolitaireSolver
 {
     public class BasicSolver : AbstractSolver
     {
@@ -14,6 +16,9 @@
                 tryAddToFoundationPilesFromStock,
                 tryMoveKing,
                 tryMoveAndReveal,
+                tryKingToBoard,
+                tryStockToBoardForMoveNextTurn,
+                trySearchForMoveNextTurn,
             };
 
             SolverState lastState = state;
@@ -153,22 +158,10 @@
 
             // Loop through bottoms, see if they have a matching top
             for (int i = 0; i < 7; i++)
-            {
                 for (int j = 0; j < 7; j++)
-                {
-                    // Skip the same column
-                    if (j == i) continue;
-
-                    // Skip matching colors
-                    if (Card.IsBlack(bottoms[i]) == Card.IsBlack(tops[j])) continue;
-
-                    // Skip mismatched values
-                    if (Card.GetValue(bottoms[i]) != Card.GetValue(tops[j]) - 1) continue;
-
-                    // We can move this stack
-                    canMove[i] = true;
-                }
-            }
+                    if (j != i && isValidCombo(bottoms[i], tops[j]))
+                        // We can move this stack
+                        canMove[i] = true;
 
             // Find the pile with the most face-down cards
             int mostFaceDownCards = 0;
@@ -178,29 +171,98 @@
 
             // Move the rightmost column with the most face-down cards
             for (int i = 6; i >= 0; i--)
-            {
                 if (canMove[i] && facedown[i] == mostFaceDownCards)
-                {
-                    // Loop through to find the right column again
                     for (int j = 0; j < 7; j++)
-                    {
-                        // Skip the same column
-                        if (j == i) continue;
+                        if (j != i && isValidCombo(bottoms[i], tops[j]))
+                            return "move " + i + " " + j;
 
-                        // Skip matching colors
-                        if (Card.IsBlack(bottoms[i]) == Card.IsBlack(tops[j])) continue;
+            return "NO";
+        }
 
-                        // Skip mismatched values
-                        if (Card.GetValue(bottoms[i]) != Card.GetValue(tops[j]) - 1) continue;
+        // 04: Move a king from the stock to an empty column on the board
+        protected string tryKingToBoard()
+        {
+            if (Card.GetValue(stock) == 13)
+                for (int i = 0; i < 7; i++)
+                    if (board[i].Count == 0)
+                        return "stb " + i;
 
-                        return "move " + i + " " + j;
+            return "NO";
+        }
+
+        // 05: Move from waste pile to board that will allow a move next turn
+        protected string tryStockToBoardForMoveNextTurn()
+        {
+            char[] bottoms = getPileBottoms();
+            char[] tops = getPileTops();
+
+            // Find piles we could put the stock on
+            List<int> targetPileTops = new List<int>();
+            for (int i = 0; i < 7; i++)
+                if (isValidCombo(stock, tops[i]))
+                    targetPileTops.Add(i);
+
+            // Find piles that could be placed on this stock
+            List<int> targetPileBottoms = new List<int>();
+            for (int i = 0; i < 7; i++)
+                if (isValidCombo(bottoms[i], stock))
+                        targetPileBottoms.Add(i);
+
+            // If there is something in both lists, we should add this to the board.
+            if (targetPileTops.Count > 0 && targetPileBottoms.Count > 0)
+                return "stb " + targetPileTops[0];
+
+            return "NO";
+        }
+
+        // 06: Move from waste pile to board that will allow a move after a while
+
+        // 07: Cycle through, knowing there's something that would allow us to move immediately after playing it
+        protected string trySearchForMoveNextTurn()
+        {
+            char[] bottoms = getPileBottoms();
+            char[] tops = getPileTops();
+
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < 7; j++)
+                {
+                    if (i == j) continue;
+
+                    // The bottom of a pile must be the same color and 2 below the top of a different pile.
+                    if (Card.IsBlack(bottoms[i]) != Card.IsBlack(tops[j])) continue;
+
+                    if (Card.GetValue(bottoms[i]) + 2 != Card.GetValue(tops[j])) continue;
+
+                    // If we're still here, we found one.
+
+                    // Find the cards that could fill the gaps.
+                    char[] fillers = Card.FromColorAndValue(!Card.IsBlack(bottoms[i]), Card.GetValue(bottoms[i]) + 1);
+
+                    /*
+                    // If either card is in stock, cycle the stock.
+                    if (ContainsAny(cardsInStock, fillers)) {
+                        Console.WriteLine("Looking for: " + Card.ToString(fillers[0]) + " or " + Card.ToString(fillers[1]));
+                        return "cycle";
                     }
+                    */
+                    if (cardsInStock.Contains(fillers[0]))
+                    {
+                        Console.WriteLine("Looking for: " + Card.ToString(fillers[0]));
+                        return "cycle";
+                    }
+                    if (cardsInStock.Contains(fillers[1]))
+                    {
+                        Console.WriteLine("Looking for: " + Card.ToString(fillers[1]));
+                        return "cycle";
+                    }
+
+                    continue;
                 }
             }
 
             return "NO";
         }
-
 
         // Helper Methods
 
@@ -260,7 +322,7 @@
         /// <summary>
         /// Finds the number of face-down cards on the board.
         /// </summary>
-        /// <returns>An array of 7 integers</returns>
+        /// <returns>An array of 7 integers representing the amount of face-down cards in that column.</returns>
         protected int[] getFaceDownCardsOnBoard()
         {
             int[] facedown = new int[7];
@@ -271,6 +333,46 @@
                     else
                         break;
             return facedown;
+        }
+
+        /// <summary>
+        /// Checks if a card can be played on top of another card. The top card must be a different color and have 1 less value.
+        /// </summary>
+        /// <param name="top">The card to be placed on top.</param>
+        /// <param name="bottom">The bottom card.</param>
+        /// <returns>True if the top card can be placed on the bottom card.</returns>
+        protected bool isValidCombo(char top, char bottom)
+        {
+            return (Card.IsBlack(top) != Card.IsBlack(bottom)) && (Card.GetValue(top) + 1 == Card.GetValue(bottom));
+        }
+
+        /// <summary>
+        /// Checks if the card can be placed somewhere on the board.
+        /// </summary>
+        /// <param name="card">The card to place.</param>
+        /// <returns>True if the card fits somewhere.</returns>
+        protected bool canBePlacedOnBoard(char card)
+        {
+            char[] tops = getPileTops();
+            foreach(char t in tops)
+                if(isValidCombo(card, t))
+                    return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Extension method for checking if a collection contains anything from a collection.
+        /// </summary>
+        /// <typeparam name="T">Ideally only primitives, but can be anything that IEnumerable.Contains() works on.</typeparam>
+        /// <param name="source">The source collection.</param>
+        /// <param name="inputs">The collection to check for.</param>
+        /// <returns>True if any elements in inputs are in source</returns>
+        protected static bool ContainsAny(IEnumerable<char> source, IEnumerable<char> inputs)
+        {
+            foreach (char i in inputs)
+                if (source.Contains(i))
+                    return true;
+            return false;
         }
     }
 }
