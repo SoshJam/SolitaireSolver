@@ -63,7 +63,7 @@ AbstractSolver solver = new BasicSolver(game);
 solver.Reset(game);
 
 Console.WriteLine(FormatBoard(game));
-Console.WriteLine("Solver recommends: " + solver.CalculateNextMove() + (solver.Stumped ? " (stumped)" : ""));
+Console.WriteLine("Solver recommends: " + solver.CalculateNextMove() + (solver.state != SolverState.Normal ? " (stumped)" : ""));
 
 // Main Loop
 string? query;
@@ -255,7 +255,7 @@ while (true)
     else if (command == "reset")
     {
         game.Reset();
-        
+        solver.Reset(game);
     }
 
     else
@@ -265,5 +265,5 @@ while (true)
     }
 
     Console.WriteLine(FormatBoard(game));
-    Console.WriteLine("Solver recommends: " + solver.CalculateNextMove() + (solver.Stumped ? " (stumped)" : ""));
+    Console.WriteLine("Solver recommends: " + solver.CalculateNextMove() + (solver.state != SolverState.Normal ? " (stumped)" : ""));
 }

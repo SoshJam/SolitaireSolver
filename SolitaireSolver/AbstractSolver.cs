@@ -30,7 +30,11 @@
         protected int seenStock = 0;
 
         // If we don't know what move to do next and are just cycling through
-        public bool Stumped { get; protected set; }
+        public SolverState state { get; protected set; } = SolverState.Normal;
+
+        // The card in the stockpile when we were last stumped.
+        // If we see this card again, we have completed a full cycle while stumped and should reset.
+        protected char cycleStart = '#'; 
 
         // Set up variables
         public AbstractSolver(ISolitaire newGame)
@@ -64,6 +68,8 @@
             cardsInPlay.Clear();
             cardsMissing = new HashSet<char>(allCards);
             seenStock = 0;
+            state = SolverState.Normal;
+            cycleStart = '#';
         }
 
         protected void Update()
@@ -124,4 +130,14 @@
         /// <returns>The next move, formatted as a string.</returns>
         public abstract string CalculateNextMove();
     }
+}
+
+/// <summary>
+/// The state of the solver, i.e. whether or not it knows what to do.
+/// </summary>
+public enum SolverState
+{
+    Normal, // everything is going as planned
+    Stumped, // just cycling through, not knowing what to do
+    GaveUp, // completed a full stock cycle while stumped, reset recommended
 }

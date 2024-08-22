@@ -13,8 +13,17 @@
                 tryAddToFoundationPilesFromBoard,
             };
 
+            SolverState lastState = state;
+
+            // If we suggested a move last turn
+            if (lastState == SolverState.Normal)
+            {
+                // Reset the stump char
+                cycleStart = '#';
+            }
+
             // Try everything
-            Stumped = false;
+            state = SolverState.Normal;
             foreach (Func<string> check in checks)
             {
                 string result = check();
@@ -22,8 +31,26 @@
                     return result;
             }
 
-            // If we haven't returned, we are stumped.
-            Stumped = true;
+            // If we haven't returned, we are stumped or should give up.
+            // If we already gave up, stay that way.
+            if (lastState == SolverState.GaveUp)
+            {
+                state = SolverState.GaveUp;
+                return "reset";
+            }
+
+            // Check if we should give up
+            if (stock == cycleStart)
+            {
+                state = SolverState.GaveUp;
+                return "reset";
+            }
+
+            // Otherwise, we press on.
+            if (cycleStart == '#' || cycleStart == '\0')
+                cycleStart = stock;
+
+            state = SolverState.Stumped;
             return "cycle";
         }
 
