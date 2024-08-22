@@ -7,6 +7,6 @@
         /// </summary>
         /// <param name="game">The current game.</param>
         /// <returns>The next move, formatted as a string.</returns>
-        public string CalculateNextMove(ISolitaire game);
+        public static string CalculateNextMove(ISolitaire game) => throw new NotImplementedException();
     }
 }
