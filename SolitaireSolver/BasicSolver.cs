@@ -12,13 +12,20 @@ namespace SolitaireSolver
 
             // The things we will try, in order from most to least important.
             Func<string>[] checks = {
+                checkVictory,
                 tryAddToFoundationPilesFromBoard,
                 tryAddToFoundationPilesFromStock,
                 tryMoveKing,
                 tryMoveAndReveal,
                 tryKingToBoard,
                 tryStockToBoardForMoveNextTurn,
+                // To be implemented later
                 trySearchForMoveNextTurn,
+                // To be implemented later
+                seeStockPile,
+                tryAddCurrentStock,
+                tryAddAnythingToFoundationsFromBoard,
+                tryAddAnythingToFoundationsFromStock,
             };
 
             SolverState lastState = state;
@@ -65,6 +72,12 @@ namespace SolitaireSolver
         // Step Methods
         // These return a command if the move is possible, or "NO" if not.
 
+        // 00: Check to see if we've already one
+        protected string checkVictory()
+        {
+            return getMinimumFoundationValue() == 13 ? "reset" : "NO";
+        }
+
         // 01: Try to add to a foundation pile from something on the board - O(N)
         protected string tryAddToFoundationPilesFromBoard()
         {
@@ -92,7 +105,7 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 01: Try to add to a foundation pile from the stock - O(1)
+        // 02: Try to add to a foundation pile from the stock - O(1)
         protected string tryAddToFoundationPilesFromStock()
         {
             int minimumFoundationValue = getMinimumFoundationValue();
@@ -104,7 +117,7 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 02: Move a king to an empty column, if its has face-down cards in its column
+        // 03: Move a king to an empty column, if its has face-down cards in its column
         protected string tryMoveKing()
         {
             char[] bottoms = getPileBottoms();
@@ -148,7 +161,7 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 03: Move a stack on the board to reveal a face-down card - O(N) I think
+        // 04: Move a stack on the board to reveal a face-down card - O(N) I think
         protected string tryMoveAndReveal()
         {
             char[] bottoms = getPileBottoms();
@@ -179,7 +192,7 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 04: Move a king from the stock to an empty column on the board
+        // 05: Move a king from the stock to an empty column on the board
         protected string tryKingToBoard()
         {
             if (Card.GetValue(stock) == 13)
@@ -190,7 +203,7 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 05: Move from waste pile to board that will allow a move next turn
+        // 06: Move from waste pile to board that will allow a move next turn
         protected string tryStockToBoardForMoveNextTurn()
         {
             char[] bottoms = getPileBottoms();
@@ -215,9 +228,9 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 06: Move from waste pile to board that will allow a move after a while
+        // 07: Move from waste pile to board that will allow a move after a while
 
-        // 07: Cycle through, knowing there's something that would allow us to move immediately after playing it
+        // 08: Cycle through, knowing there's something that would allow us to move immediately after playing it
         protected string trySearchForMoveNextTurn()
         {
             char[] bottoms = getPileBottoms();
@@ -239,27 +252,88 @@ namespace SolitaireSolver
                     // Find the cards that could fill the gaps.
                     char[] fillers = Card.FromColorAndValue(!Card.IsBlack(bottoms[i]), Card.GetValue(bottoms[i]) + 1);
 
-                    /*
                     // If either card is in stock, cycle the stock.
                     if (ContainsAny(cardsInStock, fillers)) {
-                        Console.WriteLine("Looking for: " + Card.ToString(fillers[0]) + " or " + Card.ToString(fillers[1]));
-                        return "cycle";
-                    }
-                    */
-                    if (cardsInStock.Contains(fillers[0]))
-                    {
-                        Console.WriteLine("Looking for: " + Card.ToString(fillers[0]));
-                        return "cycle";
-                    }
-                    if (cardsInStock.Contains(fillers[1]))
-                    {
-                        Console.WriteLine("Looking for: " + Card.ToString(fillers[1]));
                         return "cycle";
                     }
 
                     continue;
                 }
             }
+
+            return "NO";
+        }
+
+        // 09: Cycle through, knowing there's something that would allow us to move after adding a few cards in a chain
+
+        // 10: Cycle through just so we can see all the stock
+        protected string seeStockPile()
+        {
+            if (seenStock < 24)
+                return "cycle";
+            return "NO";
+        }
+
+        // 11: Add whatever's currently atop the stock pile to the board
+        protected string tryAddCurrentStock()
+        {
+            // Check if it even can be added
+            if (canBePlacedOnBoard(stock))
+            {
+                // Place it on the first pile it can go on
+                char[] tops = getPileTops();
+                for (int i = 0; i < 7; i++)
+                    if (isValidCombo(stock, tops[i]))
+                        return "stb " + i;
+            }
+
+            return "NO";
+        }
+
+        // 12: Put anything on the board into a foundation pile (prioritizing smallest)
+        protected string tryAddAnythingToFoundationsFromBoard()
+        {
+            char[] tops = getPileTops();
+            int minValue = 13;
+
+            for (int i = 0; i < 7; i++)
+            {
+                int suit = (int)Card.GetSuit(tops[i]);
+                int value = Card.GetValue(tops[i]);
+
+                // Check if it can be added to the pile
+                if (value != Card.GetValue(foundationPiles[suit]) + 1)
+                    continue;
+
+                // Update minValue if so
+                if (value < minValue) minValue = value;
+            }
+
+            for (int i = 0; i < 7; i++)
+            {
+                int suit = (int)Card.GetSuit(tops[i]);
+                int value = Card.GetValue(tops[i]);
+
+                if (value != Card.GetValue(foundationPiles[suit]) + 1)
+                    continue;
+
+                // Find the first card with the min value and add it
+                if (value == minValue)
+                    return "btf " + i;
+            }
+
+            return "NO";
+        }
+
+        // 13: Put anything from the stock into a foundation pile (prioritizing smallest)
+        protected string tryAddAnythingToFoundationsFromStock()
+        {
+            int suit = (int)Card.GetSuit(stock);
+            int value = Card.GetValue(stock);
+
+            // Check if it can be added to the pile
+            if (value == Card.GetValue(foundationPiles[suit]) + 1)
+                return "stf";
 
             return "NO";
         }
