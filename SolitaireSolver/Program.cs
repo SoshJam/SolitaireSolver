@@ -58,7 +58,7 @@ string FormatBoard(SolitaireHandler game)
 }
 
 // Setup Game
-SolitaireHandler game;
+SolitaireHandler game = new BasicSolitaireGame();
 
 // Main Loop
 string? query;
