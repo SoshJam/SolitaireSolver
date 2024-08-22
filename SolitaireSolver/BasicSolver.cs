@@ -14,6 +14,7 @@
             };
 
             // Try everything
+            Stumped = false;
             foreach (Func<string> check in checks)
             {
                 string result = check();
@@ -22,6 +23,7 @@
             }
 
             // If we haven't returned, we are stumped.
+            Stumped = true;
             return "cycle";
         }
 

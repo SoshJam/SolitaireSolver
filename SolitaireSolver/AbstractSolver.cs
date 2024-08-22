@@ -29,6 +29,9 @@
         // If this is 24 we have seen every card in the stock pile
         protected int seenStock = 0;
 
+        // If we don't know what move to do next and are just cycling through
+        public bool Stumped { get; protected set; }
+
         // Set up variables
         public AbstractSolver(ISolitaire newGame)
         {
