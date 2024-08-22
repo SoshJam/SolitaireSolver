@@ -61,6 +61,7 @@ string FormatBoard(ISolitaire game)
 ISolitaire game = new BasicSolitaire();
 
 Console.WriteLine(FormatBoard(game));
+Console.WriteLine("Solver recommends: " + BasicSolver.CalculateNextMove(game));
 
 // Main Loop
 string? query;
@@ -261,4 +262,5 @@ while (true)
     }
 
     Console.WriteLine(FormatBoard(game));
+    Console.WriteLine("Solver recommends: " + BasicSolver.CalculateNextMove(game));
 }
