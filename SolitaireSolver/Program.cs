@@ -16,7 +16,7 @@ string FormatBoard(SolitaireHandler game)
     }
 
     // Divider line
-    string secondLine = "--------------------";
+    string secondLine = "-0--1--2--3--4--5--6\n";
 
     // Display the board
 
@@ -60,6 +60,8 @@ string FormatBoard(SolitaireHandler game)
 // Setup Game
 SolitaireHandler game = new BasicSolitaireGame();
 
+Console.WriteLine(FormatBoard(game));
+
 // Main Loop
 string? query;
 while (true)
@@ -99,13 +101,19 @@ while (true)
         }
         else if (revealed != '\0')
         {
-            Console.WriteLine("The card " + revealed + " was revealed.");
+            Console.WriteLine("The card " + Card.ToString(revealed) + " was revealed.");
         }
     }
 
     // Send a board card to a foundation pile
     else if (command == "btf")
     {
+        if (parameters.Length != 1)
+        {
+            Console.WriteLine("Usage: btf <column>");
+            continue;
+        }
+
         int? col = int.Parse(parameters[0]);
         if (col == null || col < 0 || col > 6)
         {
@@ -122,13 +130,19 @@ while (true)
         }
         else if (revealed != '\0')
         {
-            Console.WriteLine("The card " + revealed + " was revealed.");
+            Console.WriteLine("The card " + Card.ToString(revealed) + " was revealed.");
         }
     }
 
     // Send a foundation pile card to the board
     else if (command == "ftb")
     {
+        if (parameters.Length != 2)
+        {
+            Console.WriteLine("Usage: ftb <suit> <column>");
+            continue;
+        }
+
         int? suit = int.Parse(parameters[0]);
         if (suit == null || suit < 0 || suit > 3)
         {
@@ -154,7 +168,13 @@ while (true)
     // Move a card from the stock pile to the board
     else if (command == "stb")
     {
-        int? col = int.Parse(parameters[1]);
+        if (parameters.Length != 1)
+        {
+            Console.WriteLine("Usage: stb <column>");
+            continue;
+        }
+
+        int? col = int.Parse(parameters[0]);
         if (col == null || col < 0 || col > 6)
         {
             Console.WriteLine("Column must be an integer between 0 and 6.");
@@ -170,13 +190,20 @@ while (true)
         }
         else if (revealed != '\0')
         {
-            Console.WriteLine("The card " + revealed + " was revealed.");
+            Console.WriteLine("The card " + Card.ToString(revealed) + " was revealed.");
         }
     }
 
     // Move a card
     else if (command == "move")
     {
+        if (parameters.Length != 2 && parameters.Length != 3)
+        {
+            Console.WriteLine("Usage: move <start> <end> [offset=0]");
+            continue;
+        }
+
+
         int? start = int.Parse(parameters[0]);
         if (start == null || start < 0 || start > 6)
         {
@@ -217,7 +244,7 @@ while (true)
         }
         else if (revealed != '\0')
         {
-            Console.WriteLine("The card " + revealed + " was revealed.");
+            Console.WriteLine("The card " + Card.ToString(revealed) + " was revealed.");
         }
     }
 
@@ -227,6 +254,11 @@ while (true)
         game.Reset();
     }
 
+    else
+    {
+        Console.WriteLine("Unknown command.");
+        continue;
+    }
+
     Console.WriteLine(FormatBoard(game));
-    Console.WriteLine("====================\n");
 }
