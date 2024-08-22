@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,6 +9,42 @@ namespace SolitaireSolver
 {
     public class BasicSolitaireGame : SolitaireHandler
     {
+        // A simple list of all cards
+        private HashSet<char> allCards = new HashSet<char>();
+
+        // The cards that are still face-down
+        private Stack<char> deck = new Stack<char>();
+
+        // The cards currently face-up on the board
+        private List<char>[] board = new List<char>[7];
+        
+        // The amount of face-down cards in each column
+        private int[] faceDownBoardCards = new int[7];
+
+        // The cards in the stock pile, defaulting to 24 cards
+        private Stack<char> stockPile = new Stack<char>();
+        
+        // The cards in the waste pile, defaulting to 0 cards.
+        private Stack<char> wastePile = new Stack<char>();
+
+        // The highest cards in the foundation piles
+        private char[] foundationPiles = new char[4];
+
+        // Set up variables
+        public BasicSolitaireGame()
+        {
+            // Add all the cards to the array of all cards
+            allCards.Clear();
+            for (char x = 'A'; x <= 'Z'; x++)
+            {
+                allCards.Add(x);
+                allCards.Add((char)(x + 32)); // Add the lower-case version as well
+            }
+
+            // Start a game
+            Reset();
+        }
+
         public bool BoardToFoundations(int column, out char revealed)
         {
             throw new NotImplementedException();
@@ -15,7 +52,25 @@ namespace SolitaireSolver
 
         public char CycleStock()
         {
-            throw new NotImplementedException();
+            // Check to see if the stock pile is empty
+            if (stockPile.Count == 0)
+            {
+                // If the waste pile is also empty at the start, there's just no cards left in stock and we should just return \0
+                if (wastePile.Count == 0)
+                    return '\0';
+
+                // Replenish by stacking from the Waste Pile
+                while (wastePile.Count > 0)
+                {
+                    stockPile.Push(wastePile.Pop());
+                }
+            }
+
+            // Move a card from the stock pile to the waste pile
+            char drawnCard = stockPile.Pop();
+            wastePile.Push(drawnCard);
+
+            return drawnCard;
         }
 
         public bool FoundationsToBoard(Suit suit, int target)
@@ -25,12 +80,23 @@ namespace SolitaireSolver
 
         public List<char>[] GetBoard()
         {
-            throw new NotImplementedException();
+            List<char>[] outputBoard = new List<char>[7];
+            for (int i = 0; i < 7; i++)
+            {
+                // First add the amount of face-down cards
+                for (int f = 0; f < faceDownBoardCards[i]; f++)
+                    outputBoard[i].Add('#');
+
+                // Then just add the board
+                foreach (char c in board[i])
+                    outputBoard[i].Add(c);
+            }
+            return outputBoard;
         }
 
         public char[] GetFoundationPiles()
         {
-            throw new NotImplementedException();
+            return foundationPiles;
         }
 
         public bool MovePile(int start, int end, out char revealed, int offset = 0)
@@ -40,12 +106,39 @@ namespace SolitaireSolver
 
         public char PeekStock()
         {
-            throw new NotImplementedException();
+            if (wastePile.Count == 0)
+                return '\0';
+            return wastePile.Peek();
         }
 
         public void Reset()
         {
-            throw new NotImplementedException();
+            // Reset the deck
+            deck.Clear();
+            List<char> shuffledCards =allCards.ToList();
+            Shuffle<char>(shuffledCards);
+            foreach (char c in shuffledCards)
+                deck.Push(c);
+
+            // Draw 7 cards for the board
+            for (int i = 0; i < 7; i++)
+            {
+                board[i].Clear(); // Clear this column
+                board[i].Add(deck.Pop()); // Add one card
+                faceDownBoardCards[i] = i; // Reset the amount of face-down cards
+            }
+
+            // Draw 24 cards for the stock
+            wastePile.Clear();
+            stockPile.Clear();
+            for (int i = 0; i < 24; i++)
+                stockPile.Push(deck.Pop());
+
+            // There should be 21 cards left in the deck representing the face-down cards on the board.
+
+            // Reset the foundation piles.
+            for (int i = 0; i < 3; i++)
+                foundationPiles[i] = '\0';
         }
 
         public bool StockToBoard(int target, out char revealed)
@@ -55,7 +148,52 @@ namespace SolitaireSolver
 
         public bool StockToFoundations(out char revealed)
         {
-            throw new NotImplementedException();
+            // Check the suit of the card atop the waste pile
+            char topCard = PeekStock();
+
+            // If it's a null character the waste pile is empty.
+            if (topCard == '\0')
+            {
+                revealed = '\0';
+                return false;
+            }
+
+            int suit = (int) Card.GetSuit(topCard);
+
+            // The card can be placed there if:
+            // a) It is 1 greater than the card of the same suit, OR
+            // b) It is an Ace (value 1) and the pile of that suit is empty.
+            if (topCard - foundationPiles[suit] != 1 && !(foundationPiles[suit] == '\0' && Card.GetValue(topCard) == 1))
+            {
+                revealed = '\0';
+                return false;
+            }
+
+            // Update the pile
+            foundationPiles[suit] = topCard;
+            wastePile.Pop();
+
+            // Reveal the next card in the waste pile
+            revealed = PeekStock(); // returns \0 if empty, so we don't have to do any extra logic
+            return true;
+        }
+
+        // Helper methods
+
+        // List Shuffler
+        // From https://stackoverflow.com/questions/273313/randomize-a-listt
+        private static Random rng = new Random();
+        private static void Shuffle<T>(IList<T> list)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
         }
     }
 }
