@@ -59,9 +59,11 @@ string FormatBoard(ISolitaire game)
 
 // Setup Game
 ISolitaire game = new BasicSolitaire();
+ISolver solver = new BasicSolver();
+solver.Reset(game);
 
 Console.WriteLine(FormatBoard(game));
-Console.WriteLine("Solver recommends: " + BasicSolver.CalculateNextMove(game));
+Console.WriteLine("Solver recommends: " + solver.CalculateNextMove());
 
 // Main Loop
 string? query;
@@ -253,6 +255,7 @@ while (true)
     else if (command == "reset")
     {
         game.Reset();
+        
     }
 
     else
@@ -262,5 +265,5 @@ while (true)
     }
 
     Console.WriteLine(FormatBoard(game));
-    Console.WriteLine("Solver recommends: " + BasicSolver.CalculateNextMove(game));
+    Console.WriteLine("Solver recommends: " + solver.CalculateNextMove());
 }

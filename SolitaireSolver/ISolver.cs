@@ -5,8 +5,13 @@
         /// <summary>
         /// Calculates the next move in a game of Solitaire.
         /// </summary>
-        /// <param name="game">The current game.</param>
         /// <returns>The next move, formatted as a string.</returns>
-        public static string CalculateNextMove(ISolitaire game) => throw new NotImplementedException();
+        public string CalculateNextMove();
+
+        /// <summary>
+        /// Resets the game state with the given game.
+        /// </summary>
+        /// <param name="game">The game to transfer the state from.</param>
+        public void Reset(ISolitaire game);
     }
 }
