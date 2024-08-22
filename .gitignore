@@ -400,12 +400,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Machine-specific build files
-.vs/SolitaireSolver/FileContentIndex/26fad9e9-f0c7-456e-9f18-3a463432555c.vsidx
-.vs/SolitaireSolver/FileContentIndex/c47675a3-8d82-411e-9602-3dd74455e887.vsidx
-.vs/SolitaireSolver/FileContentIndex/e3503b3d-fc22-4264-a63b-c5d67dd10b38.vsidx
-SolitaireSolver/obj/Debug/net7.0/SolitaireSolver.assets.cache
-SolitaireSolver/obj/SolitaireSolver.csproj.nuget.g.props
-SolitaireSolver/obj/SolitaireSolver.csproj.nuget.dgspec.json
-SolitaireSolver/obj/project.assets.json
-SolitaireSolver/obj/Debug/net7.0/SolitaireSolver.GeneratedMSBuildEditorConfig.editorconfig
-SolitaireSolver/obj/project.nuget.cache
+SolitaireSolver/obj/
