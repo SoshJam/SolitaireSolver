@@ -115,6 +115,7 @@
                 {
                     lastCard = stockPile.Pop();
                     wastePile.Push(lastCard);
+                    cardsDrawn++;
                 }
 
                 // The card we drew last is the one currently at the top
@@ -289,11 +290,11 @@
             {
                 cards[0] = wastePile.Pop();
 
-                if (wastePile.Count > 1)
+                if (wastePile.Count > 0)
                 {
                     cards[1] = wastePile.Pop();
 
-                    if (wastePile.Count > 2)
+                    if (wastePile.Count > 0)
                     {
                         cards[2] = wastePile.Peek();
                     }
