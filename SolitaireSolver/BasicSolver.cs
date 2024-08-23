@@ -171,10 +171,11 @@ namespace SolitaireSolver
 
             // Loop through bottoms, see if they have a matching top
             for (int i = 0; i < 7; i++)
-                for (int j = 0; j < 7; j++)
-                    if (j != i && isValidCombo(bottoms[i], tops[j]))
-                        // We can move this stack
-                        canMove[i] = true;
+                if (bottoms[i] != '\0')
+                    for (int j = 0; j < 7; j++)
+                        if (j != i && isValidCombo(bottoms[i], tops[j]))
+                            // We can move this stack
+                            canMove[i] = true;
 
             // Find the pile with the most face-down cards
             int mostFaceDownCards = 0;
@@ -475,7 +476,9 @@ namespace SolitaireSolver
         /// <returns>True if the top card can be placed on the bottom card.</returns>
         protected bool isValidCombo(char top, char bottom)
         {
-            return (Card.IsBlack(top) != Card.IsBlack(bottom)) && (Card.GetValue(top) + 1 == Card.GetValue(bottom));
+            return (top != '\0' && bottom != '\0') &&
+                (Card.IsBlack(top) != Card.IsBlack(bottom)) &&
+                (Card.GetValue(top) + 1 == Card.GetValue(bottom));
         }
 
         /// <summary>
