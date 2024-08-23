@@ -84,7 +84,7 @@ if (gameCount == 0)
 // Print initial information
 Console.WriteLine(FormatBoard(game));
 Console.Write($"Moves: {currentMoves}");
-Console.WriteLine("\nSolver recommends: " + suggestedQuery + (solver.state != SolverState.Normal ? " (stumped)" : ""));
+Console.WriteLine("\nSolver recommends: " + suggestedQuery);
 
 
 // Main Loop
@@ -347,7 +347,7 @@ while (wins + losses < gameCount)
         if (wins > 0)
             Console.Write($" | Moves per Win: {(winningMoves / wins):F2}");
 
-        Console.WriteLine("\nSolver recommends: " + suggestedQuery + (solver.state != SolverState.Normal ? " (stumped)" : ""));
+        Console.WriteLine("\nSolver recommends: " + suggestedQuery);
     }
 }
 
