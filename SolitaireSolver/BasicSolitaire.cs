@@ -23,6 +23,9 @@
         // The highest cards in the foundation piles
         private char[] foundationPiles = new char[4];
 
+        // Whether or not the game is using Turn 3 rules
+        public bool IsTurn3 { get; set; } // set is protected because it inherits from the interface
+
         // Set up variables
         public BasicSolitaire()
         {
@@ -95,11 +98,28 @@
                 }
             }
 
-            // Move a card from the stock pile to the waste pile
-            char drawnCard = stockPile.Pop();
-            wastePile.Push(drawnCard);
+            if (!IsTurn3)
+            {
+                // Move a card from the stock pile to the waste pile
+                char drawnCard = stockPile.Pop();
+                wastePile.Push(drawnCard);
 
-            return drawnCard;
+                return drawnCard;
+            }
+            else
+            {
+                // Draw up to 3 cards
+                int cardsDrawn = 0;
+                char lastCard = '\0';
+                while (cardsDrawn < 3 && stockPile.Count > 0)
+                {
+                    lastCard = stockPile.Pop();
+                    wastePile.Push(lastCard);
+                }
+
+                // The card we drew last is the one currently at the top
+                return lastCard;
+            }
         }
 
         public bool FoundationsToBoard(Suit suit, int target)
@@ -256,9 +276,41 @@
             return wastePile.Peek();
         }
 
-        public void Reset()
+        public char[] Peek3Stock()
+        {
+            // Initialize
+            char[] cards = new char[3];
+
+            // Set to \0 by default
+            for (int i = 0; i < 3; i++) cards[i] = '\0';
+
+            // Add cards one by one, if we have enough.
+            if (wastePile.Count > 0)
+            {
+                cards[0] = wastePile.Pop();
+
+                if (wastePile.Count > 1)
+                {
+                    cards[1] = wastePile.Pop();
+
+                    if (wastePile.Count > 2)
+                    {
+                        cards[2] = wastePile.Peek();
+                    }
+
+                    wastePile.Push(cards[1]);
+                }
+
+                wastePile.Push(cards[0]);
+            }
+
+            return cards;
+        }
+
+        public void Reset(bool turn3 = false)
         {
             // Reset the deck
+            IsTurn3 = turn3;
             deck.Clear();
             List<char> shuffledCards =allCards.ToList();
             Shuffle<char>(shuffledCards);
