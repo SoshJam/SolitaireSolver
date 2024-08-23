@@ -59,27 +59,64 @@ string FormatBoard(ISolitaire game)
 
 // Setup Game
 ISolitaire game = new BasicSolitaire();
+
 AbstractSolver solver = new BasicSolver(game);
-string suggestedQuery = solver.CalculateNextMove();
 solver.Reset(game);
 
+string suggestedQuery = solver.CalculateNextMove();
+
+int wins = 0, losses = 0;
+int currentMoves = 0, totalMoves = 0, winningMoves = 0;
+
+// Get how many games to play
+Console.Write("How many games? ");
+string? gameInput = Console.ReadLine();
+int gameCount;
+
+if (gameInput == null || gameInput.Length == 0)
+    gameCount = 1000;
+else
+    gameCount = int.Parse(gameInput);
+
+if (gameCount == 0)
+    Environment.Exit(0);
+
+// Print initial information
 Console.WriteLine(FormatBoard(game));
-Console.WriteLine("Solver recommends: " + suggestedQuery + (solver.state != SolverState.Normal ? " (stumped)" : ""));
+Console.Write($"Moves: {currentMoves}");
+Console.WriteLine("\nSolver recommends: " + suggestedQuery + (solver.state != SolverState.Normal ? " (stumped)" : ""));
+
 
 // Main Loop
 string? query;
-while (true)
+bool auto = false;
+while (wins + losses < gameCount)
 {
-    query = Console.ReadLine();
-    if (query == null)
-        continue;
-
-    // Go with the suggestion if nothing is entered
-    if (query.Length == 0)
+    if (!auto)
     {
-        query = suggestedQuery;
-        Console.Write("[ " + query + " ]\n");
+        Console.Write("> ");
+        query = Console.ReadLine();
+        if (query == null)
+            continue;
+
+        // Go with the suggestion if nothing is entered
+        if (query.Length == 0)
+        {
+            query = suggestedQuery;
+            Console.Write("[ " + query + " ]\n");
+        }
+
+        // Begin auto mode if necessary
+        if (query.Split(' ')[0] == "auto")
+        {
+            Console.WriteLine("\nWarp Speed activated...\n");
+            auto = true;
+            query = suggestedQuery;
+        }
     }
+
+    else
+        query = suggestedQuery;
 
     string command = query.Split(' ')[0];
     string[] parameters = query.Split(' ').Skip(1).ToArray();
@@ -97,6 +134,7 @@ while (true)
     else if (command == "cycle")
     {
         game.CycleStock();
+        currentMoves++;
     }
 
     // Send the stock pile to a foundation pile
@@ -110,10 +148,11 @@ while (true)
             Console.WriteLine("This action is not valid.");
             continue;
         }
-        else if (revealed != '\0')
+        else if (revealed != '\0' && !auto)
         {
             Console.WriteLine("The card " + Card.ToString(revealed) + " was revealed.");
         }
+        currentMoves++;
     }
 
     // Send a board card to a foundation pile
@@ -139,10 +178,11 @@ while (true)
             Console.WriteLine("This action is not valid.");
             continue;
         }
-        else if (revealed != '\0')
+        else if (revealed != '\0' && !auto)
         {
             Console.WriteLine("The card " + Card.ToString(revealed) + " was revealed.");
         }
+        currentMoves++;
     }
 
     // Send a foundation pile card to the board
@@ -174,6 +214,7 @@ while (true)
             Console.WriteLine("This action is not valid.");
             continue;
         }
+        currentMoves++;
     }
 
     // Move a card from the stock pile to the board
@@ -199,10 +240,11 @@ while (true)
             Console.WriteLine("This action is not valid.");
             continue;
         }
-        else if (revealed != '\0')
+        else if (revealed != '\0' && !auto)
         {
             Console.WriteLine("The card " + Card.ToString(revealed) + " was revealed.");
         }
+        currentMoves++;
     }
 
     // Move a card
@@ -253,15 +295,31 @@ while (true)
             Console.WriteLine("This action is not valid.");
             continue;
         }
-        else if (revealed != '\0')
+        else if (revealed != '\0' && !auto)
         {
             Console.WriteLine("The card " + Card.ToString(revealed) + " was revealed.");
         }
+        currentMoves++;
     }
 
     // Reset the game.
     else if (command == "reset")
     {
+        // Add the moves
+        totalMoves += currentMoves;
+
+        // Check if it's a win
+        char[] foundationPiles = game.GetFoundationPiles();
+        if (foundationPiles[0] == 'M' && foundationPiles[1] == 'm' && foundationPiles[2] == 'Z' && foundationPiles[3] == 'z')
+        {
+            wins++;
+            winningMoves += currentMoves;
+        }
+        else
+            losses++;
+
+        // Reset
+        currentMoves = 0;
         game.Reset();
         solver.Reset(game);
     }
@@ -272,7 +330,31 @@ while (true)
         continue;
     }
 
-    Console.WriteLine(FormatBoard(game));
+    // Get the next move
     suggestedQuery = solver.CalculateNextMove();
-    Console.WriteLine("Solver recommends: " + suggestedQuery + (solver.state != SolverState.Normal ? " (stumped)" : ""));
+
+    if (!auto)
+    {
+        // Print game information
+        Console.WriteLine(FormatBoard(game));
+
+        if (wins + losses > 0)
+            Console.WriteLine($"Total Wins: {wins} | Total Losses: {losses} | Winrate: {((double)wins / (wins + losses) * 100):F2}%");
+
+        Console.Write($"Moves: {currentMoves}");
+        if (wins + losses > 0)
+            Console.Write($" | Moves per Game: {(totalMoves / (wins + losses)):F2}");
+        if (wins > 0)
+            Console.Write($" | Moves per Win: {(winningMoves / wins):F2}");
+
+        Console.WriteLine("\nSolver recommends: " + suggestedQuery + (solver.state != SolverState.Normal ? " (stumped)" : ""));
+    }
 }
+
+// Print final game information
+Console.WriteLine($"\n==========================================\n\nTotal Wins: {wins} | Total Losses: {losses} | Winrate: {((double)wins / (wins + losses) * 100):F2}%");
+
+Console.Write($"Moves: {currentMoves}");
+Console.Write($" | Moves per Game: {(totalMoves / (wins + losses)):F2}");
+if (wins > 0)
+    Console.Write($" | Moves per Win: {(winningMoves / wins):F2}\n");
