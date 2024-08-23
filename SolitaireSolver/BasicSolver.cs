@@ -223,7 +223,7 @@ namespace SolitaireSolver
 
             // If there is something in both lists, we should add this to the board.
             if (targetPileTops.Count > 0 && targetPileBottoms.Count > 0)
-                return "stb " + targetPileTops[0];
+                return "stb " + targetPileTops[0] + " (Allows an immediate move)";
 
             return "NO";
         }
@@ -249,7 +249,7 @@ namespace SolitaireSolver
 
                 // Check if the cards can be chained
                 if (checkStockForChain(stock, bottoms[i]))
-                    return "stb " + targetColumn; // We should take this card if so
+                    return "stb " + targetColumn + " (Part of a chain)"; // We should take this card if so
             }
 
             return "NO";
@@ -279,6 +279,11 @@ namespace SolitaireSolver
 
                     // If either card is in stock, cycle the stock.
                     if (ContainsAny(cardsInStock, fillers)) {
+                        // Many returns so we can say the exact card we're looking for
+                        if (!cardsInStock.Contains(fillers[0]))
+                            return $"cycle (Looking for {Card.ToString(fillers[1])})";
+                        if (!cardsInStock.Contains(fillers[1]))
+                            return $"cycle (Looking for {Card.ToString(fillers[0])})";
                         return $"cycle (Looking for {Card.ToString(fillers[0])} or {Card.ToString(fillers[1])})";
                     }
 
@@ -302,8 +307,17 @@ namespace SolitaireSolver
                     if (i == j) continue;
 
                     // Check if the cards can be chained via the stock pile
-                    if (checkStockForChain(tops[i], bottoms[j]))
-                        return $"cycle (Chaining {Card.ToString(tops[i])} to {Card.ToString(bottoms[j])})"; // cycle takes no params so we can add stuff
+                    if (!checkStockForChain(tops[i], bottoms[j]))
+                        continue;
+
+                    // Return exactly the cards we are looking for
+                    char[] nextChains = Card.FromColorAndValue(!Card.IsBlack(tops[i]), Card.GetValue(tops[i]) - 1);
+                    if (!cardsInStock.Contains(nextChains[0]))
+                        return $"cycle (Looking for {Card.ToString(nextChains[1])}. Chaining {Card.ToString(tops[i])} to {Card.ToString(bottoms[j])}.)";
+                    if (!cardsInStock.Contains(nextChains[1]))
+                        return $"cycle (Looking for {Card.ToString(nextChains[0])}. Chaining {Card.ToString(tops[i])} to {Card.ToString(bottoms[j])}.)";
+
+                    return $"cycle (Looking for {Card.ToString(nextChains[0])} or {Card.ToString(nextChains[1])}. Chaining {Card.ToString(tops[i])} to {Card.ToString(bottoms[j])})"; // cycle takes no params so we can add stuff
                 }
             }
 

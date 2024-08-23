@@ -158,7 +158,7 @@ while (wins + losses < gameCount)
     // Send a board card to a foundation pile
     else if (command == "btf")
     {
-        if (parameters.Length != 1)
+        if (parameters.Length < 1)
         {
             Console.WriteLine("Usage: btf <column>");
             continue;
@@ -188,7 +188,7 @@ while (wins + losses < gameCount)
     // Send a foundation pile card to the board
     else if (command == "ftb")
     {
-        if (parameters.Length != 2)
+        if (parameters.Length < 2)
         {
             Console.WriteLine("Usage: ftb <suit> <column>");
             continue;
@@ -220,7 +220,7 @@ while (wins + losses < gameCount)
     // Move a card from the stock pile to the board
     else if (command == "stb")
     {
-        if (parameters.Length != 1)
+        if (parameters.Length < 1)
         {
             Console.WriteLine("Usage: stb <column>");
             continue;
@@ -250,7 +250,7 @@ while (wins + losses < gameCount)
     // Move a card
     else if (command == "move")
     {
-        if (parameters.Length != 2 && parameters.Length != 3)
+        if (parameters.Length < 2)
         {
             Console.WriteLine("Usage: move <start> <end> [offset=0]");
             continue;
