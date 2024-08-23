@@ -15,6 +15,14 @@ string FormatBoard(ISolitaire game)
         firstLine += Card.ToString(f) + " ";
     }
 
+    // If it's turn3, display the next 2 cards atop the waste pile as well.
+    if (game.IsTurn3)
+    {
+        char[] fullPile = game.Peek3Stock();
+        firstLine += "\n   " + Card.ToString(fullPile[1]);
+        firstLine += "\n   " + Card.ToString(fullPile[2]);
+    }
+
     // Divider line
     string secondLine = "-0--1--2--3--4--5--6\n";
 
@@ -310,6 +318,9 @@ while (wins + losses < gameCount)
     // Reset the game.
     else if (command == "reset")
     {
+        // See if the next game should be turn3
+        bool isTurn3 = parameters.Length > 0 && parameters[0] == "t3";
+
         // Add the moves
         totalMoves += currentMoves;
 
@@ -325,7 +336,7 @@ while (wins + losses < gameCount)
 
         // Reset
         currentMoves = 0;
-        game.Reset();
+        game.Reset(isTurn3);
         solver.Reset(game);
 
         if (auto && (wins + losses) % (gameCount / 10) == 0)
