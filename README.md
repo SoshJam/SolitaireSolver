@@ -9,7 +9,7 @@ To make matters worse, both of these games are advertised not as something you s
 
 So I thought, why not build my own bot? This project has 3 goals:
 
-1. Take a bunch of money from these shitty companies.
+1. Take a bunch of money from these vile companies.
 2. Fill up tournament slots with super efficient bot players to discourage real victims from spending money on the game
 3. Maybe supplement my income until I can find a real job, and then just provide funds to run more bots.
 
@@ -18,13 +18,13 @@ So I thought, why not build my own bot? This project has 3 goals:
 [x] Plan out the basic project structure.
 [x] Simulate a game of solitaire via the command line.
 [x] Create an algorithm to find the optimal* move.
-[ ] Figure out how to handle Turn 3 solitaire, which is MUCH harder to deal with.
+[ ] Figure out how to handle Turn 3 solitaire, which is MUCH harder to deal with and has a much lower win rate.
 [ ] Set up a system to read a screen and convert that into game information, and
     convert movecommands into mouse actions.
 [ ] Set up this system for the free website Solitaired** and ensure it works well.
 [ ] Add some randomness to the mouse movements, in case Cash or Clash have some
-    way to account for that.
-[ ] Set up the system for those games.
+    way to account for that. Random destinations within a range, and a random bezier curve along the path to get there.
+[ ] Set up the system for the real games.
 [ ] Set up something to automatically start new games as well in those apps.
 ```
 \* Klondike Solitaire is not a solved game, so there isn't a known way to find the true best move. The goal is to simply outperform all but the very best human players.  
