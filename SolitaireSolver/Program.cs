@@ -106,8 +106,8 @@ while (wins + losses < gameCount)
             Console.Write("[ " + query + " ]\n");
         }
 
-        // Begin auto mode if necessary
-        if (query.Split(' ')[0] == "auto")
+        // Begin auto mode if requested
+        if (query.Split(' ')[0] == "auto" || query.Split(' ')[0] == "warp")
         {
             Console.WriteLine("\nWarp Speed activated...\n");
             auto = true;
