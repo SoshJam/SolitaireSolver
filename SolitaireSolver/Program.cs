@@ -146,6 +146,7 @@ while (wins + losses < gameCount)
         if (!success)
         {
             Console.WriteLine("This action is not valid.");
+            auto = false;
             continue;
         }
         else if (revealed != '\0' && !auto)
@@ -176,6 +177,7 @@ while (wins + losses < gameCount)
         if (!success)
         {
             Console.WriteLine("This action is not valid.");
+            auto = false;
             continue;
         }
         else if (revealed != '\0' && !auto)
@@ -212,6 +214,7 @@ while (wins + losses < gameCount)
         if (!success)
         {
             Console.WriteLine("This action is not valid.");
+            auto = false;
             continue;
         }
         currentMoves++;
@@ -238,6 +241,7 @@ while (wins + losses < gameCount)
         if (!success)
         {
             Console.WriteLine("This action is not valid.");
+            auto = false;
             continue;
         }
         else if (revealed != '\0' && !auto)
@@ -293,6 +297,7 @@ while (wins + losses < gameCount)
         if (!success)
         {
             Console.WriteLine("This action is not valid.");
+            auto = false;
             continue;
         }
         else if (revealed != '\0' && !auto)
