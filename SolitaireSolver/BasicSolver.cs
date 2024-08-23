@@ -18,11 +18,13 @@ namespace SolitaireSolver
                 tryMoveKing,
                 tryMoveAndReveal,
                 tryKingToBoard,
-                tryStockToBoardForMoveNextTurn,
+                tryAddBridgeCard,
                 tryAddPartOfChain,
+                tryAddSibling,
                 trySearchForMoveNextTurn,
                 trySearchForChainsInStock,
                 seeStockPile,
+                trySearchForKingsInStock,
                 tryAddCurrentStock,
                 tryAddAnythingToFoundationsFromBoard,
                 tryAddAnythingToFoundationsFromStock,
@@ -205,7 +207,7 @@ namespace SolitaireSolver
         }
 
         // 06: Move from waste pile to board that will allow a move next turn
-        protected string tryStockToBoardForMoveNextTurn()
+        protected string tryAddBridgeCard()
         {
             char[] bottoms = getPileBottoms();
             char[] tops = getPileTops();
@@ -256,7 +258,23 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 08: Cycle through, knowing there's something that would allow us to move immediately after playing it
+        // 08: Add a card if its sibling (same color and rank) is already in play
+        protected string tryAddSibling()
+        {
+            // Check if its sibling is already out and if it can be added
+            if (cardsInPlay.Contains(Card.GetSibling(stock)) && canBePlacedOnBoard(stock))
+            {
+                // Place it on the first pile it can go on
+                char[] tops = getPileTops();
+                for (int i = 0; i < 7; i++)
+                    if (isValidCombo(stock, tops[i]))
+                        return "stb " + i + " (Sibling already present)";
+            }
+
+            return "NO";
+        }
+
+        // 09: Cycle through, knowing there's something that would allow us to move immediately after playing it
         protected string trySearchForMoveNextTurn()
         {
             char[] bottoms = getPileBottoms();
@@ -295,7 +313,7 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 09: Cycle through, knowing there's something that would allow us to move after adding a few cards in a chain
+        // 10: Cycle through, knowing there's something that would allow us to move after adding a few cards in a chain
         protected string trySearchForChainsInStock()
         {
             char[] bottoms = getPileBottoms();
@@ -325,7 +343,7 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 10: Cycle through just so we can see all the stock
+        // 11: Cycle through just so we can see all the stock
         protected string seeStockPile()
         {
             if (seenStock < 24)
@@ -333,7 +351,30 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 11: Add whatever's currently atop the stock pile to the board
+        // 12: Cycle through, knowing there's a king and we have an empty space.
+        protected string trySearchForKingsInStock()
+        {
+            // See if we have any open columns
+            bool foundEmptySpace = false;
+            char[] bottoms = getPileBottoms();
+
+            for (int i = 0; i < 7; i++)
+                if (bottoms[i] == '\0')
+                    foundEmptySpace = true;
+
+            // If we do, see if we have any kings in stock
+            if (foundEmptySpace)
+            {
+                char[] kings = { 'M', 'm', 'Z', 'z' };
+
+                if (ContainsAny(cardsInStock, kings))
+                    return "cycle (Looking for a king)";
+            }
+
+            return "NO";
+        }
+
+        // 13: Add whatever's currently atop the stock pile to the board
         protected string tryAddCurrentStock()
         {
             // Check if it even can be added
@@ -349,7 +390,7 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 12: Put anything on the board into a foundation pile (prioritizing smallest)
+        // 14: Put anything on the board into a foundation pile (prioritizing smallest)
         protected string tryAddAnythingToFoundationsFromBoard()
         {
             char[] tops = getPileTops();
@@ -384,7 +425,7 @@ namespace SolitaireSolver
             return "NO";
         }
 
-        // 13: Put anything from the stock into a foundation pile (prioritizing smallest)
+        // 15: Put anything from the stock into a foundation pile (prioritizing smallest)
         protected string tryAddAnythingToFoundationsFromStock()
         {
             int suit = (int)Card.GetSuit(stock);

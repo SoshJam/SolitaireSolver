@@ -208,6 +208,19 @@
 
             return cards;
         }
+
+        /// <summary>
+        /// Returns the sibling (same color and value, but different suit) of a card.
+        /// </summary>
+        /// <param name="input">The card to check.</param>
+        /// <returns>The sibling of the card.</returns>
+        public static char GetSibling(char input)
+        {
+            if (char.ToUpper(input) < 'N')
+                return (char) (input + 13);
+            else
+                return (char)(input - 13);
+        }
     }
 
     public enum Suit
