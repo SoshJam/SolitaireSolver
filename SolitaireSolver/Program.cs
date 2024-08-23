@@ -322,6 +322,9 @@ while (wins + losses < gameCount)
         currentMoves = 0;
         game.Reset();
         solver.Reset(game);
+
+        if (auto && (wins + losses) % (gameCount / 10) == 0)
+            Console.WriteLine($"{wins + losses} games played...");
     }
 
     else
@@ -339,22 +342,22 @@ while (wins + losses < gameCount)
         Console.WriteLine(FormatBoard(game));
 
         if (wins + losses > 0)
-            Console.WriteLine($"Total Wins: {wins} | Total Losses: {losses} | Winrate: {((double)wins / (wins + losses) * 100):F2}%");
+            Console.WriteLine($"Total Wins: {wins} | Total Losses: {losses} | Winrate: {((double) wins / (wins + losses) * 100):F2}%");
 
         Console.Write($"Moves: {currentMoves}");
         if (wins + losses > 0)
-            Console.Write($" | Moves per Game: {(totalMoves / (wins + losses)):F2}");
+            Console.Write($" | Moves per Game: {((double) totalMoves / (wins + losses)):F2}");
         if (wins > 0)
-            Console.Write($" | Moves per Win: {(winningMoves / wins):F2}");
+            Console.Write($" | Moves per Win: {((double)winningMoves / wins):F2}");
 
         Console.WriteLine("\nSolver recommends: " + suggestedQuery);
     }
 }
 
 // Print final game information
-Console.WriteLine($"\n==========================================\n\nTotal Wins: {wins} | Total Losses: {losses} | Winrate: {((double)wins / (wins + losses) * 100):F2}%");
+Console.WriteLine($"\n==========================================\n\nTotal Wins: {wins} | Total Losses: {losses} | Winrate: {((double) wins / (wins + losses) * 100):F2}%");
 
 Console.Write($"Moves: {currentMoves}");
-Console.Write($" | Moves per Game: {(totalMoves / (wins + losses)):F2}");
+Console.Write($" | Moves per Game: {((double) totalMoves / (wins + losses)):F2}");
 if (wins > 0)
-    Console.Write($" | Moves per Win: {(winningMoves / wins):F2}\n");
+    Console.Write($" | Moves per Win: {((double) winningMoves / wins):F2}\n");
