@@ -19,13 +19,16 @@ So I thought, why not build my own bot? This project has 3 goals:
 [x] Simulate a game of solitaire via the command line.
 [x] Create an algorithm to find the optimal* move.
 [ ] Figure out how to handle Turn 3 solitaire, which is MUCH harder to deal with.
-[ ] Set up a system to read a screen and convert that into game information, and convert move commands into mouse actions.
-[ ] Set up this system for the free website [https://solitaired.com](Solitaired) and ensure it works well.
-[ ] Add some randomness to the mouse movements, in case Cash or Clash have some way to account for that.
-[ ] Set up the system for those games
-[ ] Set up something to automatically start new games as well in those apps
+[ ] Set up a system to read a screen and convert that into game information, and
+    convert movecommands into mouse actions.
+[ ] Set up this system for the free website Solitaired** and ensure it works well.
+[ ] Add some randomness to the mouse movements, in case Cash or Clash have some
+    way to account for that.
+[ ] Set up the system for those games.
+[ ] Set up something to automatically start new games as well in those apps.
 ```
 \* Klondike Solitaire is not a solved game, so there isn't a known way to find the true best move. The goal is to simply outperform all but the very best human players.
+\*\* [https://solitaired.com/](Solitaired) is an actually good website that has got me through many a boring lecture.
 
 ## Statistics
 
