@@ -19,9 +19,9 @@ namespace SolitaireSolver
                 tryMoveAndReveal,
                 tryKingToBoard,
                 tryStockToBoardForMoveNextTurn,
-                // To be implemented later
+                tryAddPartOfChain,
                 trySearchForMoveNextTurn,
-                // To be implemented later
+                trySearchForChainsInStock,
                 seeStockPile,
                 tryAddCurrentStock,
                 tryAddAnythingToFoundationsFromBoard,
@@ -51,14 +51,14 @@ namespace SolitaireSolver
             if (lastState == SolverState.GaveUp)
             {
                 state = SolverState.GaveUp;
-                return "reset";
+                return "reset (Stuck)";
             }
 
             // Check if we should give up
             if (stock == cycleStart)
             {
                 state = SolverState.GaveUp;
-                return "reset";
+                return "reset (Stuck)";
             }
 
             // Otherwise, we press on.
@@ -66,7 +66,7 @@ namespace SolitaireSolver
                 cycleStart = stock;
 
             state = SolverState.Stumped;
-            return "cycle";
+            return "cycle (Stumped)";
         }
 
         // Step Methods
@@ -229,6 +229,31 @@ namespace SolitaireSolver
         }
 
         // 07: Move from waste pile to board that will allow a move after a while
+        protected string tryAddPartOfChain()
+        {
+            // Check if it even can be added
+            if (!canBePlacedOnBoard(stock)) return "NO";
+
+            // Find the column it could be placed in
+            int targetColumn = 0;
+            char[] tops = getPileTops();
+            for (int i = 0; i < 7; i++)
+                if (isValidCombo((char)stock, tops[i]))
+                    targetColumn = i;
+
+            // Find the bottoms of the piles and see if this connects with anything
+            char[] bottoms = getPileBottoms();
+            for (int i = 0; i < 7; i++)
+            {
+                if (i == targetColumn) continue;
+
+                // Check if the cards can be chained
+                if (checkStockForChain(stock, bottoms[i]))
+                    return "stb " + targetColumn; // We should take this card if so
+            }
+
+            return "NO";
+        }
 
         // 08: Cycle through, knowing there's something that would allow us to move immediately after playing it
         protected string trySearchForMoveNextTurn()
@@ -254,7 +279,7 @@ namespace SolitaireSolver
 
                     // If either card is in stock, cycle the stock.
                     if (ContainsAny(cardsInStock, fillers)) {
-                        return "cycle";
+                        return $"cycle (Looking for {Card.ToString(fillers[0])} or {Card.ToString(fillers[1])})";
                     }
 
                     continue;
@@ -265,12 +290,31 @@ namespace SolitaireSolver
         }
 
         // 09: Cycle through, knowing there's something that would allow us to move after adding a few cards in a chain
+        protected string trySearchForChainsInStock()
+        {
+            char[] bottoms = getPileBottoms();
+            char[] tops = getPileTops();
+
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < 7; j++)
+                {
+                    if (i == j) continue;
+
+                    // Check if the cards can be chained via the stock pile
+                    if (checkStockForChain(tops[i], bottoms[j]))
+                        return $"cycle (Chaining {Card.ToString(tops[i])} to {Card.ToString(bottoms[j])})"; // cycle takes no params so we can add stuff
+                }
+            }
+
+            return "NO";
+        }
 
         // 10: Cycle through just so we can see all the stock
         protected string seeStockPile()
         {
             if (seenStock < 24)
-                return "cycle";
+                return "cycle (Tracking the pile)";
             return "NO";
         }
 
@@ -432,6 +476,65 @@ namespace SolitaireSolver
                 if(isValidCombo(card, t))
                     return true;
             return false;
+        }
+
+        /// <summary>
+        /// Checks if there exists a chain from the start card to the target card in the stock pile.
+        /// 
+        /// e.g. start card is 7H, end card is 4C. If either 7H or 7D, either 6S or 6C, and either 5H or 5D are in the stock pile, this returns true.
+        /// If any are missing, it returns false.
+        /// 
+        /// Does not check the stock pile for the first card or last card.
+        /// </summary>
+        /// <param name="start">The start card of the chain(inclusive)</param>
+        /// <param name="target">The end card of the chain (exclusive, assumed to be on board)</param>
+        /// <returns>True if the entire chain is present in the stock pile.</returns>
+        protected bool checkStockForChain(char start, char target)
+        {
+            if (start == target) return false;
+
+            Console.WriteLine($"Chaining check for {Card.ToString(start)} and {Card.ToString(target)}.");
+
+            // 0 if the colors match, 1 if not
+            int colorMatchBit = Card.IsBlack(start) == Card.IsBlack(target) ? 0 : 1;
+
+            // i.e. a 7 of Spades - a 4 of Hearts = a difference of 3
+            int difference = Card.GetValue(start) - Card.GetValue(target);
+
+            if (difference < 1) { Console.WriteLine("Chaining check failed -- invalid difference: " + difference); return false; }
+
+            // If the difference mod 2 equals the color bit, they can be chained!
+            // i.e. 7 of Spades - 4 of Hearts -> different colors (1), difference of 3, 3 mod 2 = 1
+            //      7 of Spades - 5 of Clubs  -> same      colors (0), difference of 2, 2 mod 2 = 0
+            // Otherwise, they can't be chained.
+            if (difference % 2 != colorMatchBit) { Console.WriteLine("Chaining check failed -- invalid start/end."); return false; }
+
+            // Iteratively go through and check if each part of this chain are in the stock.
+            difference--;
+            int targetValue = Card.GetValue(target);
+            bool targetColor = !Card.IsBlack(start);
+
+            // Note: We decrement here, which means that we don't check the stock pile for the first card (or its same-rank-and-color sibling.)
+            // This is because we use this function in only two spots:
+            // a) When checking if the current stock card can be chained, in which case we know we have it.
+            // b) When checking if any chain exists between bottoms and tops, in which case the first card definitely wouldn't be in the stock pile.
+
+            char[] possibilities;
+            while (difference > 0)
+            {
+                // Get the cards that match
+                possibilities = Card.FromColorAndValue(targetColor, targetValue + difference);
+
+                // If neither is present, there isn't a chain.
+                if (!ContainsAny(cardsInStock, possibilities)) { Console.WriteLine("Chaining check failed -- missing cards."); return false; }
+
+                difference--;
+                targetColor = !targetColor;
+            }
+
+            // If we didn't return, they can be chained.
+            Console.WriteLine($"{Card.ToString(start)} and {Card.ToString(target)} can be chained!");
+            return true;
         }
 
         /// <summary>
