@@ -493,21 +493,19 @@ namespace SolitaireSolver
         {
             if (start == target) return false;
 
-            Console.WriteLine($"Chaining check for {Card.ToString(start)} and {Card.ToString(target)}.");
-
             // 0 if the colors match, 1 if not
             int colorMatchBit = Card.IsBlack(start) == Card.IsBlack(target) ? 0 : 1;
 
             // i.e. a 7 of Spades - a 4 of Hearts = a difference of 3
             int difference = Card.GetValue(start) - Card.GetValue(target);
 
-            if (difference < 1) { Console.WriteLine("Chaining check failed -- invalid difference: " + difference); return false; }
+            if (difference < 1) return false;
 
             // If the difference mod 2 equals the color bit, they can be chained!
             // i.e. 7 of Spades - 4 of Hearts -> different colors (1), difference of 3, 3 mod 2 = 1
             //      7 of Spades - 5 of Clubs  -> same      colors (0), difference of 2, 2 mod 2 = 0
             // Otherwise, they can't be chained.
-            if (difference % 2 != colorMatchBit) { Console.WriteLine("Chaining check failed -- invalid start/end."); return false; }
+            if (difference % 2 != colorMatchBit) return false;
 
             // Iteratively go through and check if each part of this chain are in the stock.
             difference--;
@@ -526,14 +524,13 @@ namespace SolitaireSolver
                 possibilities = Card.FromColorAndValue(targetColor, targetValue + difference);
 
                 // If neither is present, there isn't a chain.
-                if (!ContainsAny(cardsInStock, possibilities)) { Console.WriteLine("Chaining check failed -- missing cards."); return false; }
+                if (!ContainsAny(cardsInStock, possibilities)) return false;
 
                 difference--;
                 targetColor = !targetColor;
             }
 
             // If we didn't return, they can be chained.
-            Console.WriteLine($"{Card.ToString(start)} and {Card.ToString(target)} can be chained!");
             return true;
         }
 
