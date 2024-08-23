@@ -27,7 +27,7 @@ So I thought, why not build my own bot? This project has 3 goals:
 [ ] Set up the system for those games.
 [ ] Set up something to automatically start new games as well in those apps.
 ```
-\* Klondike Solitaire is not a solved game, so there isn't a known way to find the true best move. The goal is to simply outperform all but the very best human players.
+\* Klondike Solitaire is not a solved game, so there isn't a known way to find the true best move. The goal is to simply outperform all but the very best human players.  
 \*\* [https://solitaired.com/](Solitaired) is an actually good website that has got me through many a boring lecture.
 
 ## Statistics
@@ -36,6 +36,6 @@ Tested over 1,000,000 games, the current algorithm has the following stats:
 
 ### Turn 1 Klondike Solitaire
 
-Win Rate: 42.50% (according to Solitaired, the average win rate is about 33.0%)
-Average Moves per game: ~120
-Average Moves per winning game: ~147
+Win Rate: 42.27% (according to Solitaired, the average win rate is about 33.0%)  
+Average Moves per game: ~118.72  
+Average Moves per winning game: ~145.01  
