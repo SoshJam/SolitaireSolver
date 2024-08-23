@@ -3,6 +3,14 @@
     public interface ISolitaire
     {
         /// <summary>
+        /// Whether or not the game is using Turn-3 rules:
+        /// 
+        /// Whenever the stock pile is cycled, (up to) 3 cards are drawn instead of 1. The only way to access cards X away
+        /// from the top of the pile (where X mod 3 != 0) is to play extra cards ahead of them, which may lock future opportunities.
+        /// </summary>
+        public bool IsTurn3 { get; protected set; }
+
+        /// <summary>
         /// Get a collection of cards currently on the main game board.
         /// </summary>
         /// <returns>An array of length 7 containing lists of cards in each column. Face down cards are represented with a pound sign (#).</returns>
@@ -23,8 +31,14 @@
         /// <summary>
         /// Peek at the card atop the waste pile.
         /// </summary>
-        /// <returns>The card atop the waste pile.</returns>
+        /// <returns>The card atop the waste pile, or \0 if that pile is empty.</returns>
         public char PeekStock();
+
+        /// <summary>
+        /// The three visible cards atop the waste pile, from top to bottom. Only the top card, element 0, is currently accessible.
+        /// </summary>
+        /// <returns>An array of 3 cards, from top to bottom, or \0 if any spot is empty.</returns>
+        public char[] Peek3Stock();
 
         /// <summary>
         /// Attempts to move a pile on the board from one column to another.
@@ -70,6 +84,7 @@
         /// <summary>
         /// Resets the game state.
         /// </summary>
-        public void Reset();
+        /// <param name="turn3">If the game should use Turn 3 rules.</param>
+        public void Reset(bool turn3 = false);
     }
 }
