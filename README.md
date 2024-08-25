@@ -3,7 +3,7 @@ By Sam Hill
 
 ---
 
-I've been getting a whole lot of ads recently for two mobile games, Solitaire Cash and Solitaire Clash. Both of them offer real money for participating in Solitaire Tournaments. However, these tournaments cost real money (well, freemium currency) to enter, and the payouts are a fraction of how much actually goes in.
+I've been getting a whole lot of ads recently for two mobile games, Solitaire Cash and Solitaire Clash. Both of them offer real money for participating in Solitaire Tournaments. However, these tournaments cost real money (and/or freemium currency) to enter, and the payouts are a fraction of how much actually goes in.
 
 To make matters worse, both of these games are advertised not as something you should play for fun, but as a way to pay off debt, make rent, or even afford a house. That infuriates me, as it's manipulating people into spending time and money on the slight hope of financial security. However, while I was doomscrolling about these games, I came across some interviews that said that the high-paying tournaments were just filled with bots, and that made gameplay pretty discouraging.
 
