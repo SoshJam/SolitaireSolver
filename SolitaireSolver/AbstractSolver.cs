@@ -2,39 +2,67 @@
 {
     public abstract class AbstractSolver
     {
-        // The game
+        /// <summary>
+        /// The game this solver is currently dealing with.
+        /// </summary>
         ISolitaire game;
 
-        // A simple list of all cards
+        /// <summary>
+        /// A list of all cards. Used in setup.
+        /// </summary>
         protected HashSet<char> allCards = new HashSet<char>();
 
-        // The cards currently face-up on the board
+        /// <summary>
+        /// The cards currently face-up on the board 
+        /// </summary>
         protected List<char>[] board = new List<char>[7];
 
-        // The highest cards in the foundation piles
+        /// <summary>
+        /// The highest cards in the foundation piles.
+        /// 0 = Spades, 1 = Hearts, 2 = Clubs, 3 = Diamonds
+        /// </summary>
         protected char[] foundationPiles = new char[4];
 
-        // The card currently atop the waste pile (or \0 if empty)
+        /// <summary>
+        /// The card currently atop the waste pile (or \0 if empty)
+        /// </summary>
         protected char stock = '\0';
 
-        // The cards we know to be in the stock pile
-        protected HashSet<char> cardsInStock = new HashSet<char>();
+        /// <summary>
+        /// The cards we know to be in the stock pile, in the order that we saw them.
+        /// </summary>
+        protected List<char> cardsInStock = new List<char>();
 
-        // The cards we know to be either on the board or in a foundation pile
+        /// <summary> 
+        /// The cards we know to be either on the board or in a foundation pile
+        /// </summary>
         protected HashSet<char> cardsInPlay = new HashSet<char>();
 
-        // The cards we haven't seen yet
+        /// <summary>
+        /// The cards we haven't seen yet
+        /// </summary>
         protected HashSet<char> cardsMissing = new HashSet<char>();
 
-        // If this is 24 we have seen every card in the stock pile
+        /// <summary>
+        /// If this is 24, we have seen every card in the stock pile
+        /// </summary>
         protected int seenStock = 0;
 
-        // If we don't know what move to do next and are just cycling through
+        /// <summary>
+        /// If we don't know what move to do next and are just cycling through
+        /// </summary>
         public SolverState state { get; protected set; } = SolverState.Normal;
 
-        // The card in the stockpile when we were last stumped.
-        // If we see this card again, we have completed a full cycle while stumped and should reset.
-        protected char cycleStart = '#'; 
+        /// <summary>
+        /// The card in the stockpile when we were last stumped.
+        /// If we see this card again, we have completed a full cycle while stumped and should reset.
+        /// </summary>
+        protected char cycleStart = '#';
+
+        /// <summary>
+        /// If the game uses Turn 3 rules
+        /// </summary>
+        protected bool isTurn3 = false;
 
         // Set up variables
         public AbstractSolver(ISolitaire newGame)
@@ -50,6 +78,7 @@
             game = newGame;
             Reset(game);
         }
+
         /// <summary>
         /// Resets the game state with the given new game.
         /// </summary>
@@ -70,6 +99,7 @@
             seenStock = 0;
             state = SolverState.Normal;
             cycleStart = '#';
+            isTurn3 = game.IsTurn3;
         }
 
         protected void Update()
@@ -82,13 +112,14 @@
             // Track the stock pile
             if (seenStock < 24 && cardsMissing.Contains(stock))
             {
-                cardsInStock.Add(stock);
+                if (!cardsInStock.Contains(stock))
+                    cardsInStock.Add(stock);
                 seenStock++;
             }
 
             // Check the board for any missing cards or cards taken from stock
             for (int i = 0; i < 7; i++)
-            { 
+            {
                 foreach (char c in board[i])
                 {
                     if (c == '#') continue;
