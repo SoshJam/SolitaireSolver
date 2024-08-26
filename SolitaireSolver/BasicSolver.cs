@@ -1,10 +1,64 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace SolitaireSolver
+﻿namespace SolitaireSolver
 {
     public class BasicSolver : AbstractSolver
     {
+        /// <summary>
+        /// Used in turn-3 mode. The cards that are currently accessible in the deck.
+        /// </summary>
+        protected HashSet<char> accessibleCards = new HashSet<char>();
+
         public BasicSolver(ISolitaire newGame) : base(newGame) { }
+
+        public override void Reset(ISolitaire newGame)
+        {
+            base.Reset(newGame);
+
+            accessibleCards.Clear();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (isTurn3)
+            {
+                // Clear the set
+                accessibleCards.Clear();
+
+                // How many cards from the bottom the current top card is, mod 3.
+                int stockMod3 = -1; // -1 until we get to the stock pile.
+
+                // Loop through the list of cards in the stock pile, from the bottom to the top.
+                for (int i = 0; i < cardsInStock.Count; i++)
+                {
+                    // If we haven't seen the stock card yet
+                    if (stockMod3 == -1)
+                    {
+                        // If this is the stock card, set its mod 3 and add it.
+                        if (cardsInStock[i] == stock)
+                        {
+                            stockMod3 = i % 3;
+                            accessibleCards.Add(stock);
+                        }
+
+                        // Otherwise, add all cards with a mod 3 of 0.
+                        else if (i % 3 == 0)
+                        {
+                            accessibleCards.Add(cardsInStock[i]);
+                        }
+                    }
+
+                    // Otherwise, add every card with the same mod 3 as that card.
+                    else if (i % 3 == stockMod3)
+                    {
+                        accessibleCards.Add(cardsInStock[i]);
+                    }
+                }
+
+                // Add the top card, which will always be accessible.
+                if (cardsInStock.Count > 0) accessibleCards.Add(cardsInStock.Last());
+            }
+        }
 
         public override string CalculateNextMove()
         {
@@ -222,7 +276,7 @@ namespace SolitaireSolver
             List<int> targetPileBottoms = new List<int>();
             for (int i = 0; i < 7; i++)
                 if (isValidCombo(bottoms[i], stock))
-                        targetPileBottoms.Add(i);
+                    targetPileBottoms.Add(i);
 
             // If there is something in both lists, we should add this to the board.
             if (targetPileTops.Count > 0 && targetPileBottoms.Count > 0)
@@ -297,7 +351,8 @@ namespace SolitaireSolver
                     char[] fillers = Card.FromColorAndValue(!Card.IsBlack(bottoms[i]), Card.GetValue(bottoms[i]) + 1);
 
                     // If either card is in stock, cycle the stock.
-                    if (ContainsAny(cardsInStock, fillers)) {
+                    if (ContainsAny(cardsInStock, fillers))
+                    {
                         // Many returns so we can say the exact card we're looking for
                         if (!cardsInStock.Contains(fillers[0]))
                             return $"cycle (Looking for {Card.ToString(fillers[1])})";
@@ -530,8 +585,8 @@ namespace SolitaireSolver
         protected bool canBePlacedOnBoard(char card)
         {
             char[] tops = getPileTops();
-            foreach(char t in tops)
-                if(isValidCombo(card, t))
+            foreach (char t in tops)
+                if (isValidCombo(card, t))
                     return true;
             return false;
         }

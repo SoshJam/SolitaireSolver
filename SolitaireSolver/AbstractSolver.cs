@@ -83,7 +83,7 @@
         /// Resets the game state with the given new game.
         /// </summary>
         /// <param name="game">The game to transfer the state from.</param>
-        public void Reset(ISolitaire newGame)
+        public virtual void Reset(ISolitaire newGame)
         {
             game = newGame;
 
@@ -102,7 +102,10 @@
             isTurn3 = game.IsTurn3;
         }
 
-        protected void Update()
+        /// <summary>
+        /// Updates the game state by reading from the current game.
+        /// </summary>
+        protected virtual void Update()
         {
             // Easy updates
             board = game.GetBoard();
@@ -112,9 +115,30 @@
             // Track the stock pile
             if (seenStock < 24 && cardsMissing.Contains(stock))
             {
-                if (!cardsInStock.Contains(stock))
-                    cardsInStock.Add(stock);
-                seenStock++;
+                // For Turn 1 mode
+                if (!isTurn3)
+                {
+                    if (!cardsInStock.Contains(stock))
+                        cardsInStock.Add(stock);
+                    seenStock++;
+                }
+
+                // For Turn 3 mode
+                else
+                {
+                    char[] top3 = game.Peek3Stock();
+
+                    // We have to make sure we add it from the bottom up
+                    // to make sure they are put in the list in the correct order
+                    for (int i = 2; i >= 0; i--)
+                    {
+                        if (top3[i] == '\0') continue; // Ignore if this card is empty.
+
+                        if (!cardsInStock.Contains(top3[i]))
+                            cardsInStock.Add(top3[i]);
+                        seenStock++;
+                    }
+                }
             }
 
             // Check the board for any missing cards or cards taken from stock
