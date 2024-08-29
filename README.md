@@ -19,6 +19,7 @@ So I thought, why not build my own bot? This project has 3 goals:
 [x] Simulate a game of solitaire via the command line.
 [x] Create an algorithm to find the optimal* move.
 [ ] Figure out how to handle Turn 3 solitaire, which is MUCH harder to deal with and has a much lower win rate.
+[ ] Look into machine learning. I don't know anything about that, but maybe it could outperform the existing solver with enough training.
 [ ] Set up a system to read a screen and convert that into game information, and
     convert movecommands into mouse actions.
 [ ] Set up this system for the free website Solitaired** and ensure it works well.
