@@ -9,7 +9,7 @@ To make matters worse, both of these games are advertised not as something you s
 
 So I thought, why not build my own bot? This project has 3 goals:
 
-1. Take a bunch of money from these vile companies.
+1. Take a bunch of money from these companies.
 2. Fill up tournament slots with super efficient bot players to discourage real victims from spending money on the game
 3. Maybe supplement my income until I can find a real job, and then just provide funds to run more bots.
 
